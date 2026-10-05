@@ -1,0 +1,542 @@
+@import 'tailwindcss';
+@import '@fontsource-variable/onest';
+@import '@fontsource-variable/azeret-mono';
+
+@source "./**/*.{tsx,ts}";
+
+/* Material: Organic Blob UI. Mycelium, a fungal ecology field lab.
+   ===========================================================================
+   THE CSS THAT DOES THE MATERIAL WORK. Delete any one of these four blocks and
+   the material visibly breaks.
+
+   1. IRREGULAR MULTI-PERCENTAGE RADII.
+      Four blob classes, every one a four-corner two-axis radius written as
+      `min(<percentage>, <pixel cap>)`, never a uniform round, a pill or a
+      square: `.blob-media`, `.blob-tile`, `.blob-panel`, `.blob-slab`.
+      The percentage half keeps every corner different and organic. The pixel
+      cap is what makes the family safe: a bare `58%` of a 900px card is a
+      522px corner that would eat a line of text, so each cap is held at the
+      container's own padding depth and the curve can never reach a glyph at
+      any width.
+
+   2. BLOB MORPH.
+      `@keyframes blob-morph-media` cycles FOUR different percentage radii
+      over 19s so a shape appears to breathe. `blob-morph-panel` (31s) and
+      `blob-morph-slab` (37s) are the slow twins for text surfaces, holding the
+      same pixel caps so nothing jitters on load.
+      `.morph-drift` runs the breath continuously on the hero plate.
+      `.morph-on-hover` starts it while a pointer is over a card.
+      Every keyframe keeps both radii of each axis comfortably under 100%,
+      because a pair over 100 makes the browser scale all eight radii down and
+      flatten the shape back into an oval.
+
+   3. MYCELIAL LINE WORK.
+      `--mycelial` is an inline SVG of branching hyphae with secondary
+      branchlets. It is laid down as TWO tiled layers at different scales and
+      offsets (body::before and `.hyphae`) so the branching never reads as
+      repeating wallpaper.
+
+   4. SPORE-SPECK TEXTURE.
+      `.spore-field` stacks four low-opacity radial gradients at four different
+      background sizes, so the specks scatter like a spore print instead of
+      falling into an obvious grid. Carried by body::after at six sizes and by
+      `.spore-field` on individual panels.
+
+   RADIUS SYSTEM. Locked, one organic family, four members, no exceptions.
+     .blob-media   strongest curve, image plates only (no text inside)
+     .blob-tile    strongest curve, alternate geometry, image plates only
+     .blob-panel   moderate, card and text panels (p-4 to p-8)
+     .blob-slab    shallow, wide bands and the form (p-4 to p-10)
+   Interactive controls are the one documented exception and they use
+   `--radius-seed` (999px): anything you press or type into is a seed, never a
+   blob, so the interactive layer stays calm against the grown layer. No other
+   radius value appears anywhere on the page.
+
+   REDUCED MOTION. `prefers-reduced-motion: reduce` sets every blob animation
+   to `animation: none` and pins every blob class to its resting radius, so
+   shapes stay grown, they just stop breathing. */
+
+@theme {
+  --color-litter: #0e1e18;
+  --color-bark: #16291f;
+  --color-humus: #1f3a2c;
+  --color-moss: #2c5340;
+  --color-veil: #e3ece5;
+  --color-veil-dim: #9cb2a3;
+  --color-spore: #a3d6b6;
+
+  --font-display: 'Onest Variable', system-ui, sans-serif;
+  --font-sans: 'Onest Variable', system-ui, sans-serif;
+  --font-mono: 'Azeret Mono Variable', ui-monospace, 'SF Mono', monospace;
+
+  --radius-seed: 999px;
+}
+
+@layer base {
+  :root {
+    /* One drawing of a branching hyphal network, reused at three scales.
+       Percent-encoded so it survives any CSS minifier intact. */
+    --mycelial: url("data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 width=%27520%27 height=%27520%27 viewBox=%270 0 520 520%27%3E %3Cg fill=%27none%27 stroke=%27%23a3d6b6%27 stroke-width=%270.55%27 stroke-linecap=%27round%27 stroke-opacity=%270.26%27%3E %3Cpath d=%27M260 260 C300 246 330 268 372 250%27/%3E %3Cpath d=%27M372 250 C398 238 420 254 450 242%27/%3E %3Cpath d=%27M336 258 C348 280 342 302 358 322%27/%3E %3Cpath d=%27M372 250 C392 268 414 276 430 296%27/%3E %3Cpath d=%27M430 296 C440 310 448 322 462 330%27/%3E %3Cpath d=%27M260 260 C236 276 212 262 182 278%27/%3E %3Cpath d=%27M182 278 C160 290 146 306 124 300%27/%3E %3Cpath d=%27M202 270 C192 248 206 228 192 208%27/%3E %3Cpath d=%27M260 260 C256 228 280 208 270 180%27/%3E %3Cpath d=%27M270 180 C282 164 292 156 300 140%27/%3E %3Cpath d=%27M280 208 C306 194 322 206 346 188%27/%3E %3Cpath d=%27M260 260 C222 252 190 268 158 256%27/%3E %3Cpath d=%27M298 254 C306 276 302 298 322 316%27/%3E %3Cpath d=%27M236 268 C228 292 240 312 228 336%27/%3E %3Cpath d=%27M228 336 C220 352 226 366 218 380%27/%3E %3Cpath d=%27M190 262 C178 284 186 302 176 320%27/%3E %3Cpath d=%27M246 244 C238 228 248 212 240 196%27/%3E %3Cpath d=%27M320 246 C332 262 328 280 340 292%27/%3E %3Cpath d=%27M120 300 C104 310 92 320 78 318%27/%3E %3Cpath d=%27M460 332 C470 340 478 352 480 366%27/%3E %3C/g%3E %3Cg fill=%27%23a3d6b6%27 fill-opacity=%270.2%27%3E %3Ccircle cx=%27260%27 cy=%27260%27 r=%272.1%27/%3E %3Ccircle cx=%27372%27 cy=%27250%27 r=%271.7%27/%3E %3Ccircle cx=%27182%27 cy=%27278%27 r=%271.6%27/%3E %3Ccircle cx=%27430%27 cy=%27296%27 r=%271.5%27/%3E %3Ccircle cx=%27322%27 cy=%27316%27 r=%271.4%27/%3E %3Ccircle cx=%27124%27 cy=%27300%27 r=%271.5%27/%3E %3Ccircle cx=%27270%27 cy=%27180%27 r=%271.4%27/%3E %3Ccircle cx=%27158%27 cy=%27256%27 r=%271.3%27/%3E %3C/g%3E %3C/svg%3E");
+  }
+
+  html {
+    -webkit-text-size-adjust: 100%;
+    color-scheme: dark;
+  }
+
+  body {
+    background-color: var(--color-litter);
+    color: var(--color-veil);
+    font-family: var(--font-sans);
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* THE FIELD. A forest-floor scrim first, so the hyphae read as texture
+     lying under the page rather than as line art drawn over it. Then three
+     scales of mycelial line work
+     so the branching reads at two densities and never tiles visibly. */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    z-index: -2;
+    pointer-events: none;
+    background-image:
+      linear-gradient(180deg, rgb(14 30 24 / 0.55) 0%, rgb(11 24 20 / 0.4) 100%),
+      var(--mycelial),
+      var(--mycelial),
+      var(--mycelial),
+      radial-gradient(48% 36% at 8% 4%, #1c4234 0%, transparent 62%),
+      radial-gradient(44% 34% at 94% 14%, #17382b 0%, transparent 66%),
+      radial-gradient(56% 42% at 74% 96%, #1a3f31 0%, transparent 68%),
+      linear-gradient(178deg, #112219 0%, #0e1e18 46%, #0b1814 100%);
+    /* The second hyphal layer is rotated off-axis, which is what kills the
+       visible tile: the eye can no longer line the branches up between
+       repeats. Rotation is applied on the layer, not the element, so it does
+       not disturb the fixed field. */
+    background-size:
+      100% 100%,
+      560px 560px,
+      890px 890px,
+      740px 740px,
+      100% 100%,
+      100% 100%,
+      100% 100%,
+      100% 100%;
+    /* Three hyphal layers at three incommensurate sizes and offsets, so no
+       two branch lines ever line up and the network reads as continuous
+       growth rather than as a wallpaper repeat. */
+    background-position:
+      0 0,
+      0 0,
+      210px 150px,
+      415px 285px,
+      0 0,
+      0 0,
+      0 0,
+      0 0;
+    background-repeat:
+      no-repeat,
+      repeat, repeat, repeat, no-repeat, no-repeat, no-repeat, no-repeat;
+  }
+
+  /* THE SPORE PRINT. Six specks at six scales, very low opacity. */
+  body::after {
+    content: '';
+    position: fixed;
+    inset: 0;
+    z-index: -1;
+    pointer-events: none;
+    background-image:
+      radial-gradient(circle at 14% 26%, rgb(163 214 182 / 0.2) 0 1px, transparent 1.7px),
+      radial-gradient(circle at 68% 12%, rgb(163 214 182 / 0.15) 0 1px, transparent 1.6px),
+      radial-gradient(circle at 86% 63%, rgb(163 214 182 / 0.17) 0 1.2px, transparent 1.8px),
+      radial-gradient(circle at 34% 79%, rgb(163 214 182 / 0.13) 0 1px, transparent 1.6px),
+      radial-gradient(circle at 52% 44%, rgb(163 214 182 / 0.16) 0 1.1px, transparent 1.7px),
+      radial-gradient(circle at 22% 92%, rgb(163 214 182 / 0.12) 0 1.4px, transparent 2px);
+    background-size:
+      190px 190px,
+      260px 260px,
+      330px 330px,
+      230px 230px,
+      420px 420px,
+      560px 560px;
+  }
+
+  ::selection {
+    background-color: var(--color-spore);
+    color: var(--color-litter);
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--color-spore);
+    outline-offset: 3px;
+    border-radius: var(--radius-seed);
+  }
+
+  h1,
+  h2,
+  h3 {
+    font-family: var(--font-display);
+    font-weight: 500;
+    letter-spacing: -0.03em;
+    line-height: 1.02;
+    text-wrap: balance;
+  }
+
+  select option {
+    background-color: var(--color-bark);
+    color: var(--color-veil);
+  }
+}
+
+@layer components {
+  .shell {
+    max-width: 1400px;
+    margin-inline: auto;
+    padding-inline: 1.25rem;
+  }
+
+  @media (min-width: 768px) {
+    .shell {
+      padding-inline: 2.5rem;
+    }
+  }
+
+  /* ---- 1. THE GROWN FAMILY ------------------------------------------- */
+
+  /* Two tiers, one organic family, four members, no exceptions.
+
+     TIER 1, MEDIA. `.blob-media` and `.blob-tile` carry the loudest, most
+     irregular geometry and are applied ONLY to elements with no text inside
+     (the <img> itself). These are uncapped percentages, so the silhouette
+     is genuinely grown. Every adjacent pair of radii, including the wrap
+     pair, is kept at or under 100%: a pair over 100 makes the browser scale
+     all eight radii down together and flatten the shape into a plain oval.
+
+     TIER 2, TEXT. `.blob-panel` and `.blob-slab` hold text, so each radius
+     is written `min(<percentage>, <pixel cap>)`. A bare 50% of a 900px card is
+     a 450px corner that would swallow a line, so the pixel cap is held at the
+     container's own padding depth and the curve can never reach a glyph at
+     any width or breakpoint. The percentage half still keeps the silhouette
+     organic, just shallower.
+
+     Interactive controls are the one documented exception and they use
+     `--radius-seed` (999px): anything you press or type into is a seed, never
+     a blob, so the interactive layer stays calm against the grown layer. */
+
+  .blob-media {
+    border-radius: 58% 34% 44% 30% / 42% 56% 32% 36%;
+  }
+
+  .blob-tile {
+    border-radius: 34% 56% 30% 46% / 58% 38% 52% 32%;
+  }
+
+  .blob-panel {
+    border-radius:
+      min(22%, 26px) min(28%, 18px) min(20%, 24px) min(25%, 20px) /
+      min(30%, 26px) min(24%, 18px) min(27%, 24px) min(26%, 20px);
+  }
+
+  .blob-slab {
+    border-radius:
+      min(13%, 34px) min(17%, 24px) min(11%, 28px) min(15%, 26px) /
+      min(9%, 30px) min(13%, 34px) min(10%, 28px) min(11%, 30px);
+  }
+
+  /* ---- 2. THE BREATH --------------------------------------------------- */
+
+  .morph-drift {
+    animation: blob-morph-media 23s cubic-bezier(0.45, 0, 0.55, 1) infinite;
+  }
+
+  .morph-on-hover:hover {
+    animation: blob-morph-media 19s cubic-bezier(0.45, 0, 0.55, 1) infinite;
+  }
+
+  /* The slow breath on text surfaces. Same capped geometry as the resting
+     state, so nothing jumps on load. */
+  .morph-panel {
+    animation: blob-morph-panel 31s cubic-bezier(0.45, 0, 0.55, 1) infinite;
+  }
+
+  .morph-slab {
+    animation: blob-morph-slab 37s cubic-bezier(0.45, 0, 0.55, 1) infinite;
+  }
+
+  /* Media breath. Only an image sits inside these, so the curve can run wild
+     and this is where the material is loudest. */
+  @keyframes blob-morph-media {
+    0%,
+    100% {
+      border-radius: 58% 34% 44% 30% / 42% 56% 32% 36%;
+    }
+    25% {
+      border-radius: 34% 58% 30% 44% / 56% 38% 52% 34%;
+    }
+    50% {
+      border-radius: 44% 30% 58% 34% / 32% 58% 36% 50%;
+    }
+    75% {
+      border-radius: 30% 44% 34% 58% / 38% 32% 54% 44%;
+    }
+  }
+
+  /* Panel breath. Same capped geometry as the resting state, so the shape
+     does not jump on load. */
+  @keyframes blob-morph-panel {
+    0%,
+    100% {
+      border-radius:
+        min(22%, 26px) min(28%, 18px) min(20%, 24px) min(25%, 20px) /
+        min(30%, 26px) min(24%, 18px) min(27%, 24px) min(26%, 20px);
+    }
+    33% {
+      border-radius:
+        min(28%, 26px) min(20%, 18px) min(25%, 24px) min(22%, 20px) /
+        min(24%, 26px) min(27%, 18px) min(26%, 24px) min(30%, 20px);
+    }
+    66% {
+      border-radius:
+        min(20%, 26px) min(25%, 18px) min(28%, 24px) min(22%, 20px) /
+        min(27%, 26px) min(26%, 18px) min(30%, 24px) min(24%, 20px);
+    }
+  }
+
+  @keyframes blob-morph-slab {
+    0%,
+    100% {
+      border-radius:
+        min(13%, 34px) min(17%, 24px) min(11%, 28px) min(15%, 26px) /
+        min(9%, 30px) min(13%, 34px) min(10%, 28px) min(11%, 30px);
+    }
+    33% {
+      border-radius:
+        min(17%, 34px) min(11%, 24px) min(15%, 28px) min(13%, 26px) /
+        min(13%, 30px) min(9%, 34px) min(11%, 28px) min(10%, 30px);
+    }
+    66% {
+      border-radius:
+        min(11%, 34px) min(15%, 24px) min(17%, 28px) min(13%, 26px) /
+        min(10%, 30px) min(11%, 34px) min(9%, 28px) min(13%, 30px);
+    }
+  }
+
+  /* ---- 3 + 4. THE SUBSTRATE UNDER EACH BLOB ---------------------------- */
+
+  /* Matte leaf mould with the hyphal network drawn into it. The background is
+     clipped by the element's own box radius, so no line ever crosses the
+     grown edge. */
+  .hyphae {
+    background-color: var(--color-bark);
+    background-image:
+      var(--mycelial),
+      linear-gradient(152deg, rgb(44 83 64 / 0.5) 0%, rgb(22 41 31 / 0.18) 46%, rgb(14 30 24 / 0.5) 100%);
+    background-size: 470px 470px, 100% 100%;
+  }
+
+  .hyphae-soft {
+    background-image:
+      var(--mycelial),
+      linear-gradient(170deg, rgb(31 58 44 / 0.42) 0%, rgb(14 30 24 / 0.18) 100%);
+    background-size: 700px 700px, 100% 100%;
+    background-position: 150px 90px, 0 0;
+  }
+
+  .panel-edge {
+    border: 1px solid rgb(163 214 182 / 0.16);
+    box-shadow:
+      inset 0 1px 0 rgb(227 236 229 / 0.07),
+      0 26px 54px -34px rgb(4 14 10 / 0.85);
+  }
+
+  /* SUBSTRATE GRADE. Picsum serves whatever sits behind a seed, so every
+     photograph is pulled into the same leaf-mould range before it reaches the
+     page. `filter` alone would desaturate; the sepiatone ramp plus a spore-
+     tinted shadow keeps a bright sky from shouting against the deep forest
+     base, and the mild contrast drop stops a photo reading as a separate
+     object pasted on the page. Delete this and the six images look like six
+     different stock agencies. */
+  .substrate {
+    filter: saturate(0.78) hue-rotate(26deg) brightness(0.46) contrast(1.1)
+      sepia(0.14);
+  }
+
+  .spore-field {
+    background-image:
+      radial-gradient(circle at 22% 32%, rgb(163 214 182 / 0.22) 0 1px, transparent 1.7px),
+      radial-gradient(circle at 74% 18%, rgb(163 214 182 / 0.16) 0 1.1px, transparent 1.8px),
+      radial-gradient(circle at 58% 78%, rgb(163 214 182 / 0.18) 0 1px, transparent 1.7px),
+      radial-gradient(circle at 12% 88%, rgb(163 214 182 / 0.14) 0 1.2px, transparent 1.9px);
+    background-size: 210px 210px, 300px 300px, 250px 250px, 370px 370px;
+  }
+
+  /* ---- COMPONENT LAYER -------------------------------------------------- */
+
+  .micro {
+    font-family: var(--font-mono);
+    font-size: 10.5px;
+    line-height: 1.2;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: var(--color-veil-dim);
+  }
+
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.6rem;
+    white-space: nowrap;
+    border-radius: var(--radius-seed);
+    padding: 0.8rem 1.4rem;
+    font-size: 0.9375rem;
+    font-weight: 500;
+    letter-spacing: -0.01em;
+    transition:
+      transform 380ms cubic-bezier(0.32, 0.72, 0, 1),
+      background-color 380ms cubic-bezier(0.32, 0.72, 0, 1),
+      box-shadow 380ms cubic-bezier(0.32, 0.72, 0, 1);
+  }
+
+  .btn:active {
+    transform: translateY(1px) scale(0.985);
+  }
+
+  .btn-primary {
+    background: var(--color-spore);
+    color: var(--color-litter);
+    box-shadow: 0 12px 28px -16px rgb(163 214 182 / 0.7);
+  }
+
+  .btn-primary:hover {
+    background: #b6e0c4;
+  }
+
+  .btn-ghost {
+    color: var(--color-veil);
+    border: 1px solid rgb(163 214 182 / 0.28);
+    background: rgb(31 58 44 / 0.4);
+  }
+
+  .btn-ghost:hover {
+    background: rgb(44 83 64 / 0.55);
+  }
+
+  .btn-icon {
+    display: grid;
+    place-items: center;
+    width: 1.75rem;
+    height: 1.75rem;
+    margin-right: -0.6rem;
+    border-radius: var(--radius-seed);
+    background: rgb(14 30 24 / 0.16);
+    transition: transform 380ms cubic-bezier(0.32, 0.72, 0, 1);
+  }
+
+  .btn:hover .btn-icon {
+    transform: translate(2px, -1px);
+  }
+
+  .btn-ghost .btn-icon {
+    background: rgb(163 214 182 / 0.18);
+  }
+
+  .reveal {
+    opacity: 0;
+    transform: translateY(20px);
+    transition:
+      opacity 620ms cubic-bezier(0.16, 1, 0.3, 1),
+      transform 620ms cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  .reveal.is-visible {
+    opacity: 1;
+    transform: none;
+  }
+
+  .link-underline {
+    text-decoration: underline;
+    text-decoration-thickness: 1px;
+    text-underline-offset: 4px;
+    text-decoration-color: rgb(163 214 182 / 0.4);
+    transition: text-decoration-color 300ms cubic-bezier(0.32, 0.72, 0, 1);
+  }
+
+  .link-underline:hover {
+    text-decoration-color: var(--color-spore);
+  }
+
+  .field {
+    width: 100%;
+    border-radius: var(--radius-seed);
+    padding: 0.75rem 1rem;
+    color: var(--color-veil);
+    background: rgb(14 30 24 / 0.55);
+    border: 1px solid rgb(163 214 182 / 0.22);
+    font-size: 0.9375rem;
+    transition:
+      border-color 300ms cubic-bezier(0.32, 0.72, 0, 1),
+      background-color 300ms cubic-bezier(0.32, 0.72, 0, 1);
+  }
+
+  .field::placeholder {
+    color: var(--color-veil-dim);
+    opacity: 0.7;
+  }
+
+  .field:focus {
+    outline: none;
+    border-color: var(--color-spore);
+    background: rgb(14 30 24 / 0.8);
+  }
+
+  .field-invalid {
+    border-color: #cf8467;
+  }
+}
+
+/* REDUCED MOTION: the breath stops dead. Every blob is pinned to a single
+   static percentage radius so it stays grown, just still. */
+@media (prefers-reduced-motion: reduce) {
+  .reveal {
+    opacity: 1;
+    transform: none;
+    transition: none;
+  }
+
+  .morph-drift,
+  .morph-on-hover:hover,
+  .morph-panel,
+  .morph-slab {
+    animation: none;
+  }
+
+  .blob-media {
+    border-radius: 58% 34% 44% 30% / 42% 56% 32% 36%;
+  }
+
+  .blob-tile {
+    border-radius: 34% 56% 30% 46% / 58% 38% 52% 32%;
+  }
+
+  .blob-panel {
+    border-radius:
+      min(22%, 26px) min(28%, 18px) min(20%, 24px) min(25%, 20px) /
+      min(30%, 26px) min(24%, 18px) min(27%, 24px) min(26%, 20px);
+  }
+
+  .blob-slab {
+    border-radius:
+      min(13%, 34px) min(17%, 24px) min(11%, 28px) min(15%, 26px) /
+      min(9%, 30px) min(13%, 34px) min(10%, 28px) min(11%, 30px);
+  }
+
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
